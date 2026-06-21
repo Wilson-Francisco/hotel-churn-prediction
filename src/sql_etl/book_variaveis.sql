@@ -1,7 +1,15 @@
-SELECT 
+SELECT
     t1.user_id,
-    
-     -- Médias de satisfação do utilizador
+    -- Dias entre a data da safra e a última review do utilizador
+    (julianday('2023-12-31') - julianday(MAX(t1.review_date))) AS ultima_review,
+
+      -- Visão para isolar a volumetria e frequência do utilizador
+    COUNT(t1.review_id) as freq_total_reviews,
+    SUM(CASE WHEN t1.review_date >= date('2023-12-31', '-90 days') THEN 1 ELSE 0 END) AS freq_reviews_ultimos_90_dias,
+    SUM(CASE WHEN t1.review_date >= date('2023-12-31', '-180 days') THEN 1 ELSE 0 END) AS freq_reviews_ultimos_180_dias,
+    SUM(CASE WHEN t1.review_date >= date('2023-12-31', '-365 days') THEN 1 ELSE 0 END) AS freq_reviews_ultimos_365_dias,
+
+      -- Médias de satisfação do utilizador
     AVG(t1.score_overall) AS sat_media_score_overall,
     AVG(t1.score_cleanliness) AS sat_media_score_limpeza,
     AVG(t1.score_comfort) AS sat_media_score_conforto,

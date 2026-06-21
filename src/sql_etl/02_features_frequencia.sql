@@ -1,5 +1,6 @@
 SELECT
     t1.user_id,
+    
     -- Visão para isolar a volumetria e frequência do utilizador
     COUNT(t1.review_id) as freq_total_reviews,
     SUM(CASE WHEN t1.review_date >= date('2023-12-31', '-90 days') THEN 1 ELSE 0 END) AS freq_reviews_ultimos_90_dias,
