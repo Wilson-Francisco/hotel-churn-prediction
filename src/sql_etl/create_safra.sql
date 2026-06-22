@@ -1,3 +1,5 @@
+--DROP TABLE IF EXISTS tb_books_user;
+
 WITH target_safra AS (
     
     SELECT 
@@ -26,6 +28,5 @@ SELECT
 FROM tb_books_user AS t1
 LEFT JOIN target_safra AS t2 ON t1.user_id = t2.user_id
 LIMIT 15;
-
 
 
