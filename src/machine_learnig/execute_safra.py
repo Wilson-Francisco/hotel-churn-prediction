@@ -4,9 +4,8 @@ import sqlalchemy
 
 
 EP_DIR = os.path.dirname(os.path.abspath(__file__))
-# Correção: Subir os níveis corretos para encontrar a raiz do projeto
 SRC_DIR = os.path.dirname(EP_DIR)       # src/
-BASE_DIR = os.path.dirname(SRC_DIR)     # raiz do projeto (hotel-churn-prediction/)
+BASE_DIR = os.path.dirname(SRC_DIR)     # raiz do projeto 
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 SQL_DIR = os.path.join(SRC_DIR, 'sql_etl')
 
@@ -28,14 +27,14 @@ def connect_db():
 query_path = os.path.join(SQL_DIR, 'query_1.sql')
 
 query = import_query(query_path)
-query = query.format(date='2022-12-31')
+query = query.format(date='2025-12-31')
 
 
 con = connect_db()
 
 with con.connect() as connection:
     try:
-        connection.execute(sqlalchemy.text("delete from tb_books_user where ref_date = '{date}'".format(date='2022-12-31')))
+        connection.execute(sqlalchemy.text("delete from tb_books_user where ref_date = '{date}'".format(date='2025-12-31')))
         connection.commit()
     except Exception:
         print('Nada a ser deletado')
