@@ -4,6 +4,7 @@
         SELECT
             '{date}' AS ref_date,
             t1.review_date,
+            t1.review_id,
             t1.user_id,
             t2.hotel_name,
             t2.city,
@@ -36,7 +37,7 @@
 
         FROM reviews as t1
         JOIN hotels AS t2 ON t1.hotel_id = t2.hotel_id
-        WHERE t1.review_date BETWEEN date('{date}', '-365 days') AND '{date}'
+        WHERE t1.review_date < '{date}' AND t1.review_date >= date('{date}', '-365 days')
         GROUP BY t1.user_id
     )
         
