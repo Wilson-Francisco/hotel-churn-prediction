@@ -9,7 +9,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import pandas as pd
 from feature_engine.encoding import OneHotEncoder
 from sklearn import metrics
-from imblearn.pipeline import Pipeline
+from imblearn.pipeline import Pipeline 
 from sklearn import tree
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
@@ -38,6 +38,7 @@ df_abt.drop(['ref_date', 'review_id', 'user_id'],axis=1, inplace=True )
 # Converte a coluna review_date para datetime
 df_abt['review_date'] = pd.to_datetime(df_abt['review_date'], format='%Y-%m-%d')
 
+df_abt.columns = [str(coluna_nome) for coluna_nome in df_abt.columns]
 
 # Baixa o dicionário de regras do VADER (focado em avaliações/sentimentos)
 # nltk.download('vader_lexicon')
@@ -59,6 +60,13 @@ print("Extraindo o sentimento dos textos...")
 # Aplica a função em toda a base abt
 df_abt['sentimento_review'] = df_abt['review_text'].apply(extrair_sentimento)
 
+
+# Separando as variáveis categóricas
+variaveis_categoricas = []
+for i in df_abt.columns[0:14].tolist():
+        if df_abt.dtypes[i] == 'object' or df_abt.dtypes[i] == 'category':
+            variaveis_categoricas.append(i)
+
 # As features numéricas e categóricas selecionadas
 features_numericas = [
     'sat_media_score_overall', 'sentimento_review', 'sat_media_score_limpeza',
@@ -69,6 +77,7 @@ features_categoricas = ['hotel_name', 'user_gender', 'age_group', 'traveller_typ
 
 # Concatenacao das features
 features = features_numericas + features_categoricas
+target = 'target_churn'
 
 
 # Cria o encoder e aplicar OneHotEncoder# Cria o encoder e aplicar OneHotEncoder
@@ -88,9 +97,9 @@ target = 'target_churn'
 X_train, X_test, y_train, y_test = train_test_split(df_abt[features], df_abt[target] , test_size = 0.2, random_state = 42)
 
 
-# Modelo de árvore de Classificador de Árvore de Decisão
+# Modelo de árvore de classificador de Árvore de Decisão
 clf_tree = tree.DecisionTreeClassifier(max_depth=5, random_state = 42)
-
+ 
 # Pipeline com todos objetos
 model_pipeline = Pipeline(steps = [("onehot", onehot),
                                    ("norm ", norm ),
@@ -98,10 +107,13 @@ model_pipeline = Pipeline(steps = [("onehot", onehot),
                                    ("clf_tree", clf_tree)])
 
 
-""" 
 # Ajustando o modelo
-model_pipeline.fit(X_train[features], y_train)
+model_pipeline.fit(X_train[features], y_train)                                  
 
+
+print(X_train[features].head())  
+
+ 
 # Salvando o algoritmo
 model = pd.Series(
     {
@@ -154,11 +166,14 @@ plt.legend(
         f"Teste: {100*scores_test:.2f}%"
     ])
 
-plt.show() """
+plt.show() 
 
-
-
-
+# Feature_importance do modelo
+features_names = (model.iloc[0][0].transform(X_train[features]).columns.tolist())
+feature_importance = pd.Series(model.iloc[0][-1].feature_importances_,
+                               index=features_names)
+feature_importance.sort_values(ascending=False)
+print(feature_importance.sort_values(ascending=False))
 
 
 
