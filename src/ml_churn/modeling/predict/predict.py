@@ -13,11 +13,11 @@ BASE_DIR = os.path.dirname(MODELING_DIR)
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), 'data') 
 
-engine = sqlalchemy.create_engine("sqlite:///" + os.path.join(DATA_DIR, 'booking_db.sqlite'))
+con = sqlalchemy.create_engine("sqlite:///" + os.path.join(DATA_DIR, 'booking_db.sqlite'))
 
 
 # tabela ABT para todas as analises
-abt = pd.read_sql_table('tb_abt_churn', engine)
+abt = pd.read_sql_table('tb_abt_churn', con)
 
 
 df_oot = abt[abt['ref_date'] == abt['ref_date'].max()].copy() # filtrando base out of time
@@ -77,11 +77,13 @@ model_clf_tree = mlflow.sklearn.load_model(f"models:/Modelo_clf_tree_encoder/{ve
 
 # Predição do modelo
 predicao = model_clf_tree.predict_proba(df_oot[features])[:,1]
-df_oot["Proba_churn_hotel"] = predicao
+df_oot["score_churn_hotel"] = predicao
 
 
-print(df_oot[['user_id', 'Proba_churn_hotel']].head(20))
-print("\n" + "-"*75)
-print(df_oot.head())
+# Enviando os dados para o banco de dados
+df_oot[['user_id', 'score_churn_hotel']].to_sql("tb_score_churn_hotel", con, if_exists='replace', index=False)
+
+
+print(df_oot[['user_id', 'score_churn_hotel']].head(20))
 
 
