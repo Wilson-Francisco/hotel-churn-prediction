@@ -3,10 +3,9 @@ import pandas as pd
 import sqlalchemy
 import numpy as np
 import matplotlib.pyplot as plt
-import nltk
+from feature_engine.imputation import MeanMedianImputer
 import mlflow
 import mlflow.sklearn
-from mlflow.tracking import MlflowClient
 from imblearn.over_sampling import SMOTE
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import pandas as pd
@@ -110,7 +109,9 @@ with mlflow.start_run():
     clf_tree = tree.DecisionTreeClassifier(max_depth=5, random_state = 42)
 
     # Pipeline com todos objetos
-    model_pipeline = Pipeline(steps = [("onehot", onehot),
+    model_pipeline = Pipeline(steps = [
+                                     ("imputer", MeanMedianImputer(imputation_method="median", variables=features_numericas)),
+                                    ("onehot", onehot),
                                     ("norm ", norm ),
                                     ("smote", smote),
                                     ("clf_tree", clf_tree)])
@@ -130,6 +131,7 @@ with mlflow.start_run():
         "feature_engine.encoding.one_hot.OneHotEncoder",
         "imblearn.over_sampling._smote.base.SMOTE",
         "imblearn.pipeline.Pipeline",
+        "feature_engine.imputation.mean_median.MeanMedianImputer",
     ]
 
     # Registra o pipeline completo no MLflow
@@ -187,11 +189,12 @@ with mlflow.start_run():
     plt.show()
 
 # Feature_importance do modelo
-features_names = (model.iloc[0][0].transform(X_train[features]).columns.tolist())
-feature_importance = pd.Series(model.iloc[0][-1].feature_importances_,
+features_names = model["model"][:-1].get_feature_names_out().tolist()
+feature_importance = pd.Series(model["model"][-1].feature_importances_,
                                index=features_names)
 feature_importance.sort_values(ascending=False)
 print(feature_importance.sort_values(ascending=False))
+
 
 
 
