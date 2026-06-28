@@ -1,5 +1,10 @@
-pandas==2.2.2
-scikit-learn==1.5.0
-fastapi==0.111.0
-uvicorn==0.30.1
-pytest==8.2.2
+pandas
+numpy
+scikit-learn
+imbalanced-learn
+feature-engine
+mlflow
+sqlalchemy
+matplotlib
+nltk
+skops
