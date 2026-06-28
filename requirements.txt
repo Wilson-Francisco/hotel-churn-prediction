@@ -1,0 +1,10 @@
+pandas
+numpy
+scikit-learn
+imbalanced-learn
+feature-engine
+mlflow
+sqlalchemy
+matplotlib
+nltk
+skops
