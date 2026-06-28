@@ -1,16 +1,15 @@
 name: Machine Learning CI/CD Pipeline
 
-# O pipeline roda automaticamente a cada Push ou Pull Request nas branches principais
 on:
   push:
-    branches: [main]
+    branches: [ main, develop ]
   pull_request:
-    branches: [main]
+    branches: [ main]
 
 jobs:
-  # ==========================================
+
   # ETAPA 1: CI (INTEGRAÇÃO CONTÍNUA)
-  # ==========================================
+
   continuous-integration:
     name: Executar Testes de Código e Dados
     runs-on: ubuntu-latest
@@ -41,20 +40,20 @@ jobs:
       run: |
         python -c "import nltk; nltk.download('vader_lexicon')"
 
-    - name: [CI] Testar Queries SQL (Book e ABT)
+    - name: 'CI - Testar Queries SQL (Book e ABT)'
       run: |
         python -m unittest test_database.py
 
-    - name: [CI] Testar Pipeline de Machine Learning
+    - name: 'CI - Testar Pipeline de Machine Learning'
       run: |
         python -m unittest test_modeling.py
 
-  # ==========================================
+
   # ETAPA 2: CD (ENTREGA CONTÍNUA)
-  # ==========================================
+
   continuous-deployment:
     name: Deploy do Modelo Registrado
-    needs: continuous-integration # O CD SÓ EXECUTA SE O CI PASSAR 100%
+    needs: continuous-integration
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
 
@@ -65,6 +64,4 @@ jobs:
     - name: Executar Deploy Simulado
       run: |
         echo "Pronto! O SQL está correto e o modelo passou em todos os testes unitários."
-        echo "Iniciando o deploy do modelo unificado 'Modelo_clf_tree_encoder' para produção..."
-        # Exemplo de comando real de CD:
-        # mlflow models build-docker -m "models:/Modelo_clf_tree_encoder/latest" -n "meu-modelo-image"
+        echo "Iniciando o deploy do modelo unificado para produção..."
